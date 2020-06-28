@@ -1,19 +1,11 @@
 import psycopg2
-import creating
-import inserting
-import showing
-import mainWindow
-import insertDialog
+from db_api import creating, inserting, showing, delAndSearch
+from forms import insertDialog, findDialog, delDialog, mainWindow, infoDialog
 import sys
-import delDialog
-import findDialog
-import del_and_search
-import infoDialog
 import re
 import test
 
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
+from PyQt5 import QtWidgets, QtCore
 
 regex = re.compile(
     r'^(?:http|ftp)s?://'  # http:// or https://
@@ -88,7 +80,7 @@ class DelForm(QtWidgets.QDialog, delDialog.Ui_delDialog):
 
     def doDel(self):
         field_dict = getInfo(self)
-        del_and_search.call_find(field_dict, cursor, 1)
+        delAndSearch.call_find(field_dict, cursor, 1)
         clear(self)
         self.close()
 
@@ -101,7 +93,7 @@ class FindForm(QtWidgets.QDialog, findDialog.Ui_FindDialog):
 
     def doFind(self):
         field_dict = getInfo(self)
-        k = del_and_search.call_find(field_dict, cursor, 2)
+        k = delAndSearch.call_find(field_dict, cursor, 2)
         window.ListWidget.clear()
         window.ListWidget.addItem("Результат поиска:")
         window.output(k)
@@ -151,7 +143,7 @@ class InsertForm(QtWidgets.QDialog, insertDialog.Ui_InsertDialog):
             field_dict = getInfo(self)
         else:
             field_dict = getInfoNoA(self)
-        k = del_and_search.call_find(field_dict, cursor, 0)
+        k = delAndSearch.call_find(field_dict, cursor, 0)
         if k:
             inserting.call_insert(field_dict, cursor)
             self.infoLabel.setText("Поля со звездочкой являются обязательными")
@@ -192,7 +184,7 @@ class MainForm(QtWidgets.QMainWindow, mainWindow.Ui_MainWindow):
         genre = b[0][1:]
         country = b[1][1:]
 
-        field_dict = del_and_search.findFullInfo(source, name, author, genre, country, cursor)
+        field_dict = delAndSearch.findFullInfo(source, name, author, genre, country, cursor)
         self.infoForm.sourceEdit.setText(field_dict['Ссылка на видео'])
         self.infoForm.nameEdit.setText(field_dict['Название видео'])
         self.infoForm.genreEdit.setText(field_dict['Жанр видео'])
@@ -240,13 +232,11 @@ conn = psycopg2.connect(
     host="localhost",
     port="5432")
 
-
 cursor = conn.cursor()
 creating.delete_db(cursor)
 creating.create_db(cursor)
-app = QtWidgets.QApplication(sys.argv)
 test.testAdd(cursor)
-
+app = QtWidgets.QApplication(sys.argv)
 window = MainForm()
 window.show()
 app.exec_()

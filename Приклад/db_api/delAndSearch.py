@@ -1,4 +1,4 @@
-import showing
+from db_api import showing
 
 
 def call_find(field_dict, cursor, mod=1):

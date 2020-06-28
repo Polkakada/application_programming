@@ -1,20 +1,20 @@
-import inserting
-import creating
 import psycopg2
-import del_and_search
-import showing
 
-# conn = psycopg2.connect(
-#     database="postgres",
-#     user="postgres",
-#     password="qwer1234",
-#     host="localhost",
-#     port="5432")
-#
-# cursor = conn.cursor()
-# creating.delete_db(cursor)
-#
-# creating.create_db(cursor)
+from db_api import inserting, creating, delAndSearch, showing
+
+
+def connect():
+    conn = psycopg2.connect(
+        database="postgres",
+        user="postgres",
+        password="qwer1234",
+        host="localhost",
+        port="5432")
+
+    cursor = conn.cursor()
+    creating.delete_db(cursor)
+
+    creating.create_db(cursor)
 
 
 def testAdd(cursor):
